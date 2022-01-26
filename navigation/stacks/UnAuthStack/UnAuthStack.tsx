@@ -19,11 +19,11 @@ export default function UnAuthStack() {
         component={SignInScreen}
         options={{ headerTitle: SignInScreen.headerTitle }}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name={Screens.SignUpScreen}
         component={SignUpScreen}
         options={{ headerTitle: SignUpScreen.headerTitle }}
-      /> */}
+      />
     </Stack.Navigator>
   );
 }

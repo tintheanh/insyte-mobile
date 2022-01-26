@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Animated, View, Text, TouchableOpacity, Keyboard } from "react-native";
-import { ParamListBase, useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { Layout } from "../../../constants";
 import { EmailInput, PasswordInput, BigButton } from "../../../components";
 import { Screens } from "../../index";
 import { SignInScreenProps } from "./props";
 import styles from "./styles";
 // import { alertErrorToast } from '../../../utils';
+import SignUpScreen from "../SignUpScreen/SignUpScreen";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const screenHeight = Layout.window.height;
 
 function SignInScreen({ loading, error }: SignInScreenProps) {
-  const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const moveUpValue = useMemo(() => new Animated.Value(0), []);
   //   const dispatch = useDispatch();
   //   const [keyboardHeight] = useKeyboard();
@@ -77,12 +77,12 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
     <View style={styles.container}>
       <Animated.View style={[styles.textBoxWrapper, transformStyle]}>
         <Text style={styles.title}>sign in to Insyte</Text>
-        {/* <EmailInput value={email} setEmail={setEmail} />
-        <PasswordInput value={password} setPassword={setPassword} /> */}
+        <EmailInput value={email} setEmail={setEmail} />
+        <PasswordInput value={password} setPassword={setPassword} />
         {/* <BigButton label="Sign in" loading={loading} onPress={performSignIn} /> */}
         <View style={styles.signUpView}>
           <Text style={styles.questionText}>First time here? </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUpScreen')}>
             <Text style={styles.navText}>Sign up</Text>
           </TouchableOpacity>
         </View>
