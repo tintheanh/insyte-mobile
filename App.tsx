@@ -1,5 +1,5 @@
-import { RootStack } from './navigation/stacks';
+import { RootStack } from "./navigation/stacks";
 
 export default function App() {
-	return <RootStack />;
+  return <RootStack />;
 }
