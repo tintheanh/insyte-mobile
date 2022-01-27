@@ -6,17 +6,21 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Layout } from '../../../constants';
 import { EmailInput, PasswordInput, BigButton } from '../../../components';
 import { SignInScreenProps } from './props';
-import SignUpScreen from '../SignUpScreen/SignUpScreen';
 import { useKeyboard } from '../../../utils';
+import { Screens } from '../../index';
 import styles from './styles';
 
 const screenHeight = Layout.window.height;
 
 function SignInScreen({ loading, error }: SignInScreenProps) {
 	const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
 	const moveUpValue = useMemo(() => new Animated.Value(0), []);
+
 	const [keyboardHeight] = useKeyboard();
+
 	const [email, setEmail] = useState<string>('');
+
 	const [password, setPassword] = useState<string>('');
 
 	useEffect(() => {
@@ -38,9 +42,9 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 		[moveUpValue]
 	);
 
-	//   const goToSignUpScreen = useCallback(() => {
-	//     navigation.navigate(Screens.SignUpScreen);
-	//   }, []);
+	const goToSignUpScreen = useCallback(() => {
+		navigation.navigate(Screens.SignUpScreen);
+	}, []);
 
 	//   const goToForgotPasswordScreen = useCallback(() => {
 	//     navigation.navigate(Screens.ForgotPasswordScreen);
@@ -68,10 +72,10 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 				<Text style={styles.title}>sign in to Insyte</Text>
 				<EmailInput value={email} setEmail={setEmail} />
 				<PasswordInput value={password} setPassword={setPassword} />
-				{/* <BigButton label="Sign in" loading={loading} onPress={performSignIn} /> */}
+				<BigButton label='Sign in' loading={loading} onPress={() => console.log('signing in')} />
 				<View style={styles.signUpView}>
 					<Text style={styles.questionText}>First time here? </Text>
-					<TouchableOpacity onPress={() => navigation.navigate('SignUpScreen')}>
+					<TouchableOpacity onPress={goToSignUpScreen}>
 						<Text style={styles.navText}>Sign up</Text>
 					</TouchableOpacity>
 				</View>
