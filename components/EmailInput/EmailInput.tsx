@@ -21,7 +21,7 @@ function EmailInput({ value, setEmail }: EmailInputProps) {
   const performOnWatchBlur = () => setIsFocused(false);
 
   const focusedStyle = {
-    borderColor: isFocused ? Colors.insyte : 'rgba(255, 255, 255, 0.4)',
+    borderColor: isFocused ? Colors.insyte : Colors.border,
   };
 
   return (

@@ -1,102 +1,89 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Animated, View, Text, TouchableOpacity, Keyboard } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Animated, View, Text, TouchableOpacity, Keyboard } from 'react-native';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
-import { Layout } from "../../../constants";
-import { EmailInput, PasswordInput, BigButton } from "../../../components";
-import { Screens } from "../../index";
-import { SignInScreenProps } from "./props";
-import styles from "./styles";
-// import { alertErrorToast } from '../../../utils';
-import SignUpScreen from "../SignUpScreen/SignUpScreen";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { Layout } from '../../../constants';
+import { EmailInput, PasswordInput, BigButton } from '../../../components';
+import { SignInScreenProps } from './props';
+import SignUpScreen from '../SignUpScreen/SignUpScreen';
+import { useKeyboard } from '../../../utils';
+import styles from './styles';
 
 const screenHeight = Layout.window.height;
 
 function SignInScreen({ loading, error }: SignInScreenProps) {
-  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const moveUpValue = useMemo(() => new Animated.Value(0), []);
-  //   const dispatch = useDispatch();
-  //   const [keyboardHeight] = useKeyboard();
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+	const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+	const moveUpValue = useMemo(() => new Animated.Value(0), []);
+	const [keyboardHeight] = useKeyboard();
+	const [email, setEmail] = useState<string>('');
+	const [password, setPassword] = useState<string>('');
 
-  //   const onClearSignInError = () => dispatch(clearSignInError());
-  //   const onSignIn = (email: string, password: string) =>
-  //     dispatch(signIn(email, password));
+	useEffect(() => {
+		if (keyboardHeight) {
+			move(-(keyboardHeight - screenHeight / 4.5));
+		} else {
+			move(0);
+		}
+	}, [keyboardHeight]);
 
-  //   useEffect(() => {
-  //     if (error) {
-  //       alertErrorToast('Sign in failed', error.message, onClearSignInError);
-  //     }
-  //   }, [error]);
+	const move = useCallback(
+		(value: number, duration = 100) => {
+			Animated.timing(moveUpValue, {
+				toValue: value,
+				duration,
+				useNativeDriver: true,
+			}).start();
+		},
+		[moveUpValue]
+	);
 
-  //   useEffect(() => {
-  //     if (keyboardHeight) {
-  //       move(-(keyboardHeight - screenHeight / 4.5));
-  //     } else {
-  //       move(0);
-  //     }
-  //   }, [keyboardHeight]);
+	//   const goToSignUpScreen = useCallback(() => {
+	//     navigation.navigate(Screens.SignUpScreen);
+	//   }, []);
 
-  const move = useCallback(
-    (value: number, duration = 100) => {
-      Animated.timing(moveUpValue, {
-        toValue: value,
-        duration,
-        useNativeDriver: true,
-      }).start();
-    },
-    [moveUpValue]
-  );
+	//   const goToForgotPasswordScreen = useCallback(() => {
+	//     navigation.navigate(Screens.ForgotPasswordScreen);
+	//   }, []);
 
-  //   const goToSignUpScreen = useCallback(() => {
-  //     navigation.navigate(Screens.SignUpScreen);
-  //   }, []);
+	//   const performSignIn = () => {
+	//     Keyboard.dismiss();
+	//     onSignIn(email, password);
+	//   };
 
-  //   const goToForgotPasswordScreen = useCallback(() => {
-  //     navigation.navigate(Screens.ForgotPasswordScreen);
-  //   }, []);
+	const transformStyle = useMemo(
+		() => ({
+			transform: [
+				{
+					translateY: moveUpValue,
+				},
+			],
+		}),
+		[moveUpValue]
+	);
 
-  //   const performSignIn = () => {
-  //     Keyboard.dismiss();
-  //     onSignIn(email, password);
-  //   };
-
-  const transformStyle = useMemo(
-    () => ({
-      transform: [
-        {
-          translateY: moveUpValue,
-        },
-      ],
-    }),
-    [moveUpValue]
-  );
-
-  return (
-    <View style={styles.container}>
-      <Animated.View style={[styles.textBoxWrapper, transformStyle]}>
-        <Text style={styles.title}>sign in to Insyte</Text>
-        <EmailInput value={email} setEmail={setEmail} />
-        <PasswordInput value={password} setPassword={setPassword} />
-        {/* <BigButton label="Sign in" loading={loading} onPress={performSignIn} /> */}
-        <View style={styles.signUpView}>
-          <Text style={styles.questionText}>First time here? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('SignUpScreen')}>
-            <Text style={styles.navText}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.forgetView}>
-          <Text style={styles.questionText}>
-            Don't remember your password?{" "}
-          </Text>
-          <TouchableOpacity>
-            <Text style={styles.navText}>Forgot password</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
-    </View>
-  );
+	return (
+		<View style={styles.container}>
+			<Animated.View style={[styles.textBoxWrapper, transformStyle]}>
+				<Text style={styles.title}>sign in to Insyte</Text>
+				<EmailInput value={email} setEmail={setEmail} />
+				<PasswordInput value={password} setPassword={setPassword} />
+				{/* <BigButton label="Sign in" loading={loading} onPress={performSignIn} /> */}
+				<View style={styles.signUpView}>
+					<Text style={styles.questionText}>First time here? </Text>
+					<TouchableOpacity onPress={() => navigation.navigate('SignUpScreen')}>
+						<Text style={styles.navText}>Sign up</Text>
+					</TouchableOpacity>
+				</View>
+				<View style={styles.forgetView}>
+					<Text style={styles.questionText}>Don't remember your password? </Text>
+					<TouchableOpacity>
+						<Text style={styles.navText}>Forgot password</Text>
+					</TouchableOpacity>
+				</View>
+			</Animated.View>
+		</View>
+	);
 }
 
 // const mapStateToProps = (state: AppState) => ({
@@ -104,7 +91,7 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 //   error: state.auth.errors.signInError,
 // });
 
-SignInScreen.headerTitle = "Sign In";
+SignInScreen.headerTitle = 'Sign In';
 
 //export default connect(mapStateToProps)(SignInScreen);
 export default SignInScreen;
