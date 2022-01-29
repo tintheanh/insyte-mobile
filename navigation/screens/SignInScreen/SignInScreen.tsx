@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Layout } from '../../../constants';
 import { EmailInput, PasswordInput, BigButton } from '../../../components';
 import { SignInScreenProps } from './props';
-import { useKeyboard } from '../../../utils';
+import { alertErrorToast, authRepo, useKeyboard } from '../../../utils';
 import { Screens } from '../../index';
 import styles from './styles';
 
@@ -50,10 +50,13 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 	//     navigation.navigate(Screens.ForgotPasswordScreen);
 	//   }, []);
 
-	//   const performSignIn = () => {
-	//     Keyboard.dismiss();
-	//     onSignIn(email, password);
-	//   };
+	const performSignIn = () => {
+		Keyboard.dismiss();
+		authRepo
+			.signIn(email, password)
+			.then((userData) => console.log(userData))
+			.catch((err) => alertErrorToast('Sign in failed', err.message[0], () => console.log('close')));
+	};
 
 	const transformStyle = useMemo(
 		() => ({
@@ -72,7 +75,7 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 				<Text style={styles.title}>sign in to Insyte</Text>
 				<EmailInput value={email} setEmail={setEmail} />
 				<PasswordInput value={password} setPassword={setPassword} />
-				<BigButton label='Sign in' loading={loading} onPress={() => console.log('signing in')} />
+				<BigButton label='Sign in' loading={loading} onPress={performSignIn} />
 				<View style={styles.signUpView}>
 					<Text style={styles.questionText}>First time here? </Text>
 					<TouchableOpacity onPress={goToSignUpScreen}>
