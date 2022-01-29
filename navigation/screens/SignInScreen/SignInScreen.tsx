@@ -55,7 +55,10 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 		authRepo
 			.signIn(email, password)
 			.then((userData) => console.log(userData))
-			.catch((err) => alertErrorToast('Sign in failed', err.message[0], () => console.log('close')));
+			.catch((err) => {
+				console.log(err);
+				alertErrorToast('Sign in failed', err.message[0], () => console.log('close'));
+			});
 	};
 
 	const transformStyle = useMemo(
