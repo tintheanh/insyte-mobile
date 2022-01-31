@@ -22,4 +22,5 @@ export default {
 	insyte: '#FF00FE',
 	success: '#2ecc71',
 	border: '#ffffff66',
+	toast: '#1C1C1C',
 };

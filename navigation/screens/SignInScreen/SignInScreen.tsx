@@ -5,19 +5,24 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Layout } from '../../../constants';
 import { EmailInput, PasswordInput, BigButton } from '../../../components';
-import { SignInScreenProps } from './props';
-import SignUpScreen from '../SignUpScreen/SignUpScreen';
-import { useKeyboard } from '../../../utils';
+import { alertErrorToast, authRepo, useKeyboard } from '../../../utils';
+import { Screens } from '../../index';
 import styles from './styles';
 
 const screenHeight = Layout.window.height;
 
-function SignInScreen({ loading, error }: SignInScreenProps) {
+function SignInScreen() {
 	const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
 	const moveUpValue = useMemo(() => new Animated.Value(0), []);
+
 	const [keyboardHeight] = useKeyboard();
+
 	const [email, setEmail] = useState<string>('');
+
 	const [password, setPassword] = useState<string>('');
+
+	const [loading, setLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (keyboardHeight) {
@@ -38,18 +43,30 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 		[moveUpValue]
 	);
 
-	//   const goToSignUpScreen = useCallback(() => {
-	//     navigation.navigate(Screens.SignUpScreen);
-	//   }, []);
+	const goToSignUpScreen = useCallback(() => {
+		navigation.navigate(Screens.SignUpScreen);
+	}, []);
 
 	//   const goToForgotPasswordScreen = useCallback(() => {
 	//     navigation.navigate(Screens.ForgotPasswordScreen);
 	//   }, []);
 
-	//   const performSignIn = () => {
-	//     Keyboard.dismiss();
-	//     onSignIn(email, password);
-	//   };
+	const performSignIn = async () => {
+		Keyboard.dismiss();
+		setLoading(true);
+
+		try {
+			const userData = await authRepo.signIn(email, password);
+
+			// pass to redux to set the user data global state
+			// save token to async storage
+			console.log(userData);
+		} catch (err) {
+			const { message } = err as Error;
+			alertErrorToast('Sign in failed', message);
+		}
+		setLoading(false);
+	};
 
 	const transformStyle = useMemo(
 		() => ({
@@ -68,10 +85,10 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 				<Text style={styles.title}>sign in to Insyte</Text>
 				<EmailInput value={email} setEmail={setEmail} />
 				<PasswordInput value={password} setPassword={setPassword} />
-				{/* <BigButton label="Sign in" loading={loading} onPress={performSignIn} /> */}
+				<BigButton label='Sign in' loading={loading} onPress={performSignIn} />
 				<View style={styles.signUpView}>
 					<Text style={styles.questionText}>First time here? </Text>
-					<TouchableOpacity onPress={() => navigation.navigate('SignUpScreen')}>
+					<TouchableOpacity onPress={goToSignUpScreen}>
 						<Text style={styles.navText}>Sign up</Text>
 					</TouchableOpacity>
 				</View>
