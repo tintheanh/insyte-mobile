@@ -44,7 +44,7 @@ function PasswordInput({ value, placeholder = 'password', setPassword }: Passwor
 }
 
 export default memo(PasswordInput, (prevProps: PasswordInputProps, nextProps: PasswordInputProps) => {
-	if (prevProps.value !== nextProps.value || prevProps.setPassword !== nextProps.setPassword) {
+	if (prevProps.value !== nextProps.value) {
 		return false;
 	}
 	return true;

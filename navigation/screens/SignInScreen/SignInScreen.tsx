@@ -5,14 +5,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Layout } from '../../../constants';
 import { EmailInput, PasswordInput, BigButton } from '../../../components';
-import { SignInScreenProps } from './props';
 import { alertErrorToast, authRepo, useKeyboard } from '../../../utils';
 import { Screens } from '../../index';
 import styles from './styles';
 
 const screenHeight = Layout.window.height;
 
-function SignInScreen({ loading, error }: SignInScreenProps) {
+function SignInScreen() {
 	const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
 	const moveUpValue = useMemo(() => new Animated.Value(0), []);
@@ -22,6 +21,8 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 	const [email, setEmail] = useState<string>('');
 
 	const [password, setPassword] = useState<string>('');
+
+	const [loading, setLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (keyboardHeight) {
@@ -50,15 +51,21 @@ function SignInScreen({ loading, error }: SignInScreenProps) {
 	//     navigation.navigate(Screens.ForgotPasswordScreen);
 	//   }, []);
 
-	const performSignIn = () => {
+	const performSignIn = async () => {
 		Keyboard.dismiss();
-		authRepo
-			.signIn(email, password)
-			.then((userData) => console.log(userData))
-			.catch((err) => {
-				console.log(err);
-				alertErrorToast('Sign in failed', err.message[0], () => console.log('close'));
-			});
+		setLoading(true);
+
+		try {
+			const userData = await authRepo.signIn(email, password);
+
+			// pass to redux to set the user data global state
+			// save token to async storage
+			console.log(userData);
+		} catch (err) {
+			const { message } = err as Error;
+			alertErrorToast('Sign in failed', message);
+		}
+		setLoading(false);
 	};
 
 	const transformStyle = useMemo(

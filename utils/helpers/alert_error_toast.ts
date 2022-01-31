@@ -12,6 +12,5 @@ export default function alertErrorToast(
     position: 'bottom',
     autoHide: true,
     onHide: callBack,
-    // onPress: callBack,
   });
 }
