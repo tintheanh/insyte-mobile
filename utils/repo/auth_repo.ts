@@ -32,6 +32,30 @@ async function signIn(email: string, password: string): Promise<AuthResponse> {
 	}
 }
 
+async function signUp(username: string, email:string, password: string):Promise<AuthResponse>{
+	if(!authUrl) {
+		throw new Error('Unknown error occured');
+	}
+	try {
+		validateEmail(email);
+		validatePassword(password);
+
+		const res = await axios.post<AuthResponse>(`${authUrl}/signup`, {username, email, password});
+		const data = res.data;
+		
+		return data;
+	} catch (ex) {
+		if (axios.isAxiosError(ex)){
+			throw new Error(ex.response!.data.message[0]);
+		}
+		if (ex instanceof Error) {
+			throw new Error(ex.message);
+		}
+		throw new Error('Unknown error occurred');
+	}
+}
+
 export default {
 	signIn,
+	signUp
 };
