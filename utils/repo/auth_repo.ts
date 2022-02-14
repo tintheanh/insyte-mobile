@@ -2,6 +2,7 @@ import axios from 'axios';
 import Constants from 'expo-constants';
 
 import { AuthResponse, User } from '../../models';
+import getData from '../helpers/get_data';
 import saveData from '../helpers/save_data';
 import validateEmail from '../validations/validate_email';
 import validatePassword from '../validations/validate_password';
@@ -35,6 +36,29 @@ async function signIn(email: string, password: string): Promise<User> {
 	}
 }
 
+async function checkAuth(): Promise<User> {
+	if (!authUrl) {
+		throw new Error('Unknown error occurred');
+	}
+
+	try {
+		const token = await getData('jwt');
+		const res = await axios.post<AuthResponse>(`${authUrl}/check-auth`, { token });
+		const { data } = res;
+
+		return data.userData;
+	} catch (ex) {
+		if (axios.isAxiosError(ex)) {
+			throw new Error(ex.response!.data.message[0]);
+		}
+		if (ex instanceof Error) {
+			throw new Error(ex.message);
+		}
+		throw new Error('Unknown error occurred');
+	}
+}
+
 export default {
 	signIn,
+	checkAuth,
 };

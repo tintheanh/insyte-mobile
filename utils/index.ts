@@ -5,5 +5,6 @@ import alertErrorToast from './helpers/alert_error_toast';
 import validateEmail from './validations/validate_email';
 import validatePassword from './validations/validate_password';
 import saveData from './helpers/save_data';
+import getData from './helpers/get_data';
 
-export { isIOS, useKeyboard, authRepo, alertErrorToast, validateEmail, validatePassword, saveData };
+export { isIOS, useKeyboard, authRepo, alertErrorToast, validateEmail, validatePassword, saveData, getData };
