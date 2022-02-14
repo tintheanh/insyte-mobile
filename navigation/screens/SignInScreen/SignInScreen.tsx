@@ -1,11 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, View, Text, TouchableOpacity, Keyboard } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Layout } from '../../../constants';
 import { EmailInput, PasswordInput, BigButton } from '../../../components';
 import { alertErrorToast, authRepo, useKeyboard } from '../../../utils';
+import { setUser } from '../../../redux/auth/actions';
+import { User } from '../../../models';
 import { Screens } from '../../index';
 import styles from './styles';
 
@@ -18,11 +21,15 @@ function SignInScreen() {
 
 	const [keyboardHeight] = useKeyboard();
 
+	const dispatch = useDispatch();
+
 	const [email, setEmail] = useState<string>('');
 
 	const [password, setPassword] = useState<string>('');
 
 	const [loading, setLoading] = useState<boolean>(false);
+
+	const onSetUser = (user: User) => dispatch(setUser(user));
 
 	useEffect(() => {
 		if (keyboardHeight) {
@@ -58,10 +65,8 @@ function SignInScreen() {
 		try {
 			const userData = await authRepo.signIn(email, password);
 
-			// pass to redux to set the user data global state
-			// save token to async storage
-			console.log(userData);
-		} catch (err) {
+			onSetUser(userData);
+		} catch (err: unknown) {
 			const { message } = err as Error;
 			alertErrorToast('Sign in failed', message);
 		}
