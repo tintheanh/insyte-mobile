@@ -2,8 +2,10 @@ import axios from 'axios';
 import Constants from 'expo-constants';
 
 import { AuthResponse, User } from '../../models';
-import getData from '../helpers/get_data';
-import saveData from '../helpers/save_data';
+import getDataFromStorage from '../helpers/get_data_from_storage';
+import removeDataFromStorage from '../helpers/remove_data_from_storage';
+import saveDataInStorage from '../helpers/save_data_in_storage';
+import toError from '../helpers/to_error';
 import validateEmail from '../validations/validate_email';
 import validatePassword from '../validations/validate_password';
 
@@ -22,17 +24,11 @@ async function signIn(email: string, password: string): Promise<User> {
 		const res = await axios.post<AuthResponse>(`${authUrl}/login`, { email, password });
 		const { data } = res;
 
-		await saveData('jwt', data.token);
+		await saveDataInStorage('jwt', data.token);
 
 		return data.userData;
-	} catch (ex) {
-		if (axios.isAxiosError(ex)) {
-			throw new Error(ex.response!.data.message[0]);
-		}
-		if (ex instanceof Error) {
-			throw new Error(ex.message);
-		}
-		throw new Error('Unknown error occurred');
+	} catch (ex: unknown) {
+		throw toError(ex);
 	}
 }
 
@@ -42,23 +38,31 @@ async function checkAuth(): Promise<User> {
 	}
 
 	try {
-		const token = await getData('jwt');
+		const token = await getDataFromStorage('jwt');
+
+		if (!token) {
+			throw new Error('Token is missing');
+		}
+
 		const res = await axios.post<AuthResponse>(`${authUrl}/check-auth`, { token });
 		const { data } = res;
 
 		return data.userData;
-	} catch (ex) {
-		if (axios.isAxiosError(ex)) {
-			throw new Error(ex.response!.data.message[0]);
-		}
-		if (ex instanceof Error) {
-			throw new Error(ex.message);
-		}
-		throw new Error('Unknown error occurred');
+	} catch (ex: unknown) {
+		throw toError(ex);
+	}
+}
+
+async function logOut(): Promise<void> {
+	try {
+		await removeDataFromStorage('jwt');
+	} catch (ex: unknown) {
+		throw toError(ex);
 	}
 }
 
 export default {
 	signIn,
 	checkAuth,
+	logOut,
 };

@@ -1,37 +1,51 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { connect, useDispatch } from 'react-redux';
 
 import UnAuthStack from './UnAuthStack/UnAuthStack';
 import { AppState } from '../../redux/store';
-import { alertErrorToast, authRepo } from '../../utils';
+import { authRepo } from '../../utils';
 import { setUser } from '../../redux/auth/actions';
 import { User } from '../../models';
+import { Loading } from '../../components';
+import { HomeScreen } from '../screens';
 
-function RootStack({ user }: any) {
-	console.log(user);
+function RootStack({ isAuth }: { isAuth: boolean }) {
+	const [loading, setLoading] = useState<boolean>(false);
+
 	const dispatch = useDispatch();
 
 	const onSetUser = (user: User | null) => dispatch(setUser(user));
 
 	useEffect(() => {
-		authRepo
-			.checkAuth()
-			.then((userData) => onSetUser(userData))
-			.catch((_) => {
+		(async () => {
+			setLoading(true);
+			try {
+				const userData = await authRepo.checkAuth();
+				onSetUser(userData);
+			} catch (_) {
 				onSetUser(null);
-			});
+			}
+			setLoading(false);
+		})();
 	}, []);
 
-	return (
-		<NavigationContainer>
-			<UnAuthStack />
-		</NavigationContainer>
-	);
+	const renderStack = () => {
+		if (isAuth) {
+			return <HomeScreen />;
+		}
+		return <UnAuthStack />;
+	};
+
+	if (loading) {
+		return <Loading />;
+	}
+
+	return <NavigationContainer>{renderStack()}</NavigationContainer>;
 }
 
 const mapStateToProps = (state: AppState) => ({
-	user: state.auth.user,
+	isAuth: state.auth.user !== null,
 });
 
 export default connect(mapStateToProps)(RootStack);
