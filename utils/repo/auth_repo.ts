@@ -32,37 +32,33 @@ async function signIn(email: string, password: string): Promise<User> {
 	}
 }
 
-async function signUp(
-  email: string,
-  password: string,
-  username: string
-): Promise<User> {
-  if (!authUrl) {
-    throw new Error("");
-  }
+async function signUp(email: string, password: string, username: string): Promise<User> {
+	if (!authUrl) {
+		throw new Error('');
+	}
 
-  try {
-    validateEmail(email);
-    validatePassword(password);
-    const res = await axios.post<AuthResponse>(`${authUrl}/signUp`, {
-      email,
-      password,
-      username,
-    });
-    const { data } = res;
+	try {
+		validateEmail(email);
+		validatePassword(password);
+		const res = await axios.post<AuthResponse>(`${authUrl}/signUp`, {
+			email,
+			password,
+			username,
+		});
+		const { data } = res;
 
-    await saveData("jwt", data.token);
+		await saveDataInStorage('jwt', data.token);
 
-    return data.userData;
-  } catch (ex) {
-    if (axios.isAxiosError(ex)) {
-      throw new Error(ex.response!.data.message[0]);
-    }
-    if (ex instanceof Error) {
-      throw new Error(ex.message);
-    }
-    throw new Error("Unknown error occurred");
-  }
+		return data.userData;
+	} catch (ex) {
+		if (axios.isAxiosError(ex)) {
+			throw new Error(ex.response!.data.message[0]);
+		}
+		if (ex instanceof Error) {
+			throw new Error(ex.message);
+		}
+		throw new Error('Unknown error occurred');
+	}
 }
 
 async function checkAuth(): Promise<User> {
@@ -96,7 +92,7 @@ async function logOut(): Promise<void> {
 
 export default {
 	signIn,
-  signUp,
+	signUp,
 	checkAuth,
 	logOut,
 };
